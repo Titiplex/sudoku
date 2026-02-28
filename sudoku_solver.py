@@ -130,7 +130,7 @@ class SudokuSolver:
             return True
         return False
 
-    def solve_DFS(self, cur_grid: np.ndarray) -> np.ndarray:
+    def solve_DFS(self, cur_grid: np.ndarray) -> tuple[np.ndarray, int]:
         print(f"\n--- Uninformed Search DFS---")
         start_time = time.time()
         nodes_expanded = 0
@@ -142,7 +142,7 @@ class SudokuSolver:
         if not self.is_valid_grid(grid):
             print(f"Time: {time.time() - start_time:.4f}s")
             print(f"Nodes Expanded: {nodes_expanded}")
-            return None
+            return None, nodes_expanded
         stack: List[Tuple[int, int, List[int], int]] = []
 
         while True:
@@ -178,8 +178,8 @@ class SudokuSolver:
         print(f"Nodes Expanded: {nodes_expanded}")
 
         if self.find_empty(grid) is None and self.is_valid_grid(grid):
-            return grid
-        return None
+            return grid, nodes_expanded
+        return None, nodes_expanded
 
     def heuristic(self, grid: np.ndarray) -> int:
         """
@@ -194,7 +194,7 @@ class SudokuSolver:
 
         # return 0  # Heuristique triviale
 
-    def solve_AStar(self, grid: np.ndarray) -> np.ndarray:
+    def solve_AStar(self, grid: np.ndarray) -> tuple[np.ndarray, int]:
         print(f"\n--- A* Search ---")
         start_time = time.time()
         nodes_expanded = 0
@@ -208,7 +208,7 @@ class SudokuSolver:
         if not self.is_valid_grid(start_grid):
             print(f"Time: {time.time() - start_time:.4f}s")
             print(f"Nodes Expanded: {nodes_expanded}")
-            return None
+            return None, nodes_expanded
         start_key = tuple(map(tuple, start_grid.tolist()))
 
         ctr = 0
@@ -251,8 +251,8 @@ class SudokuSolver:
         print(f"Nodes Expanded: {nodes_expanded}")
 
         if solution is None:
-            return None
-        return solution
+            return None, nodes_expanded
+        return solution, nodes_expanded
 
     def get_best_node(self, grid: np.ndarray) -> tuple[tuple[int, int], list]:
 
@@ -284,7 +284,7 @@ class SudokuSolver:
 
         return pos, cand
 
-    def solve_greedy(self, grid: np.ndarray) -> np.ndarray:
+    def solve_greedy(self, grid: np.ndarray) -> tuple[np.ndarray, int]:
         print(f"\n--- Greedy Best-First Search ---")
         start_time = time.time()
         nodes_expanded = 0
@@ -296,7 +296,7 @@ class SudokuSolver:
         if not self.is_valid_grid(start_grid):
             print(f"Time: {time.time() - start_time:.4f}s")
             print(f"Nodes Expanded: {nodes_expanded}")
-            return None
+            return None, nodes_expanded
         start_key = tuple(map(tuple, start_grid.tolist()))
 
         ctr = 0
@@ -333,8 +333,8 @@ class SudokuSolver:
         print(f"Time: {time.time() - start_time:.4f}s")
         print(f"Nodes Expanded: {nodes_expanded}")
         if solution is None:
-            return None
-        return solution
+            return None , nodes_expanded
+        return solution, nodes_expanded
 
 
 if __name__ == '__main__':
