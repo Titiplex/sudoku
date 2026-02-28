@@ -138,8 +138,12 @@ class SudokuSolver:
         # TODO
         # Implémenter l'algorithme de recherche profondeur d'abord ici.
 
-        stack: List[Tuple[int, int, List[int], int]] = []
         grid = cur_grid.copy()
+        if not self.is_valid_grid(grid):
+            print(f"Time: {time.time() - start_time:.4f}s")
+            print(f"Nodes Expanded: {nodes_expanded}")
+            return None
+        stack: List[Tuple[int, int, List[int], int]] = []
 
         while True:
             pos, candidats = self.get_best_node(grid)
@@ -173,7 +177,9 @@ class SudokuSolver:
         print(f"Time: {time.time() - start_time:.4f}s")
         print(f"Nodes Expanded: {nodes_expanded}")
 
-        return grid
+        if self.find_empty(grid) is None and self.is_valid_grid(grid):
+            return grid
+        return None
 
     def heuristic(self, grid: np.ndarray) -> int:
         """
@@ -199,19 +205,25 @@ class SudokuSolver:
         # Hint: utilisez heapq pour une liste qui garde l'ordre croissant automatiquement
 
         start_grid = grid.copy()
-        start = tuple(map(tuple, start_grid.tolist()))
+        if not self.is_valid_grid(start_grid):
+            print(f"Time: {time.time() - start_time:.4f}s")
+            print(f"Nodes Expanded: {nodes_expanded}")
+            return None
+        start_key = tuple(map(tuple, start_grid.tolist()))
 
         ctr = 0
         h0 = self.heuristic(start_grid)
-        heap = [(0 + h0, h0, 0, ctr, start_grid, start)]
-        best = {start: 0}
+        heap = [(0 + h0, h0, 0, ctr, start_grid, start_key)]
+        best = {start_key: 0}
+
+        solution = None
 
         while heap:
             f, h, cost, _, current, cur_key = heapq.heappop(heap)
             nodes_expanded += 1
 
             if self.find_empty(current) is None and self.is_valid_grid(current):
-                grid = current
+                solution = current
                 break
 
             pos, candidats = self.get_best_node(current)
@@ -238,7 +250,9 @@ class SudokuSolver:
         print(f"Time: {time.time() - start_time:.4f}s")
         print(f"Nodes Expanded: {nodes_expanded}")
 
-        return grid
+        if solution is None:
+            return None
+        return solution
 
     def get_best_node(self, grid: np.ndarray) -> tuple[tuple[int, int], list]:
 
@@ -279,18 +293,24 @@ class SudokuSolver:
         # Implémenter l'algorithme de recherche vorace qui choisi la meilleure case à remplir (utilisez get_best_node())
 
         start_grid = grid.copy()
-        start = tuple(map(tuple, start_grid.tolist()))
+        if not self.is_valid_grid(start_grid):
+            print(f"Time: {time.time() - start_time:.4f}s")
+            print(f"Nodes Expanded: {nodes_expanded}")
+            return None
+        start_key = tuple(map(tuple, start_grid.tolist()))
 
         ctr = 0
-        heap = [(self.heuristic(start_grid), ctr, start_grid, start)]
-        visited = {start}
+        heap = [(self.heuristic(start_grid), ctr, start_grid, start_key)]
+        visited = {start_key}
+
+        solution = None
 
         while heap:
             h, _, current, curr_key = heapq.heappop(heap)
             nodes_expanded += 1
 
             if self.find_empty(current) is None and self.is_valid_grid(current):
-                grid = current
+                solution = current
                 break
 
             pos, cand = self.get_best_node(current)
@@ -312,7 +332,9 @@ class SudokuSolver:
 
         print(f"Time: {time.time() - start_time:.4f}s")
         print(f"Nodes Expanded: {nodes_expanded}")
-        return grid
+        if solution is None:
+            return None
+        return solution
 
 
 if __name__ == '__main__':
