@@ -149,6 +149,7 @@ class SudokuSolver:
             pos, candidats = self.get_best_node(grid)
 
             if pos is None:
+                cur_grid = grid
                 break
 
             r, c = pos
