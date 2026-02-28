@@ -1,10 +1,10 @@
-from typing import Tuple, List, Dict
-
-import numpy as np
 import csv
+import heapq
 import sys
 import time
-import heapq
+from typing import Tuple, List
+
+import numpy as np
 
 
 def readCSV(filename) -> np.ndarray:
@@ -145,7 +145,6 @@ class SudokuSolver:
             pos, candidats = self.get_best_node(grid)
 
             if pos is None:
-                cur_grid = grid
                 break
 
             r, c = pos
@@ -160,6 +159,7 @@ class SudokuSolver:
                         grid[pr][pc] = pcands[idx]
                         nodes_expanded += 1
                         stack[-1] = pr, pc, pcands, idx
+                        break
                     else:
                         grid[pr][pc] = 0
                         stack.pop()
@@ -173,7 +173,7 @@ class SudokuSolver:
         print(f"Time: {time.time() - start_time:.4f}s")
         print(f"Nodes Expanded: {nodes_expanded}")
 
-        return cur_grid
+        return grid
 
     def heuristic(self, grid: np.ndarray) -> int:
         """
@@ -246,7 +246,7 @@ class SudokuSolver:
         # Implémenter l'optimisation pour l'algorithme vorace qui choisi la meilleure case à remplir et les nombres possibles à mettre dedans
 
         pos = None
-        cand = None
+        cand = []
         len_ = 10
 
         for r in range(9):
@@ -255,17 +255,19 @@ class SudokuSolver:
 
                 candidates = []
                 for n in range(1, 10):
-                    if self.is_valid_move(grid, r, c, n): candidates.append(n)
+                    if self.is_valid_move(grid, r, c, n):
+                        candidates.append(n)
 
-                    if len(candidates) == 0: return (r, c), []
-                    if len(candidates) < len_:
-                        len_ = len(candidates)
-                        pos = r, c
-                        cand = candidates
+                if len(candidates) == 0:
+                    return (r, c), []
+                if len(candidates) < len_:
+                    len_ = len(candidates)
+                    pos = r, c
+                    cand = candidates
 
-                        if len_ == 1: return pos, cand
+                    if len_ == 1:
+                        return pos, cand
 
-        if pos is None: return self.find_empty(grid), [1, 2, 3, 4, 5, 6, 7, 8, 9]
         return pos, cand
 
     def solve_greedy(self, grid: np.ndarray) -> np.ndarray:
